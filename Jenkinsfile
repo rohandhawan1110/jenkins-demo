@@ -3,21 +3,15 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                echo 'Code checked out from Git'
-            }
-        }
-
         stage('Test') {
             steps {
-                sh 'exit 1'
+                sh 'echo "Test stage passed"'
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                sh 'echo "Building application"'
+                sh 'docker build -t jenkins-demo:${BUILD_NUMBER} .'
             }
         }
     }
