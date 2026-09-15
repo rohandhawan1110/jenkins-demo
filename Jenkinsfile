@@ -32,7 +32,7 @@ pipeline {
             steps {
                 sh '''
                     sleep 3
-                    curl -f http://localhost:5000
+                    curl -f http://localhost:9000
                 '''
             }
         }
