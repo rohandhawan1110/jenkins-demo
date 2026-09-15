@@ -14,5 +14,33 @@ pipeline {
                 sh 'docker build -t jenkins-demo:${BUILD_NUMBER} .'
             }
         }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                    docker rm -f jenkins-demo-test || true
+
+                    docker run -d \
+                      --name jenkins-demo-test \
+                      -p 5000:5000 \
+                      jenkins-demo:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('Verify Application') {
+            steps {
+                sh '''
+                    sleep 3
+                    curl -f http://localhost:5000
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker rm -f jenkins-demo-test || true'
+        }
     }
 }
