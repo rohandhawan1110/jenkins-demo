@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_REGION = 'ap-southeast-2'
+        ECR_REGISTRY = '470914319097.dkr.ecr.ap-southeast-2.amazonaws.com'
+        ECR_REPOSITORY = 'jenkins-demo'
+    }
+
     stages {
 
         stage('Test') {
@@ -33,6 +39,38 @@ pipeline {
                 sh '''
                     sleep 3
                     curl -f http://localhost:5000
+                '''
+            }
+        }
+
+        stage('Login to ECR') {
+            steps {
+                sh '''
+                    aws ecr get-login-password \
+                      --region ${AWS_REGION} \
+                    | docker login \
+                      --username AWS \
+                      --password-stdin \
+                      ${ECR_REGISTRY}
+                '''
+            }
+        }
+
+        stage('Tag Image for ECR') {
+            steps {
+                sh '''
+                    docker tag \
+                      jenkins-demo:${BUILD_NUMBER} \
+                      ${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('Push Image to ECR') {
+            steps {
+                sh '''
+                    docker push \
+                      ${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER}
                 '''
             }
         }
