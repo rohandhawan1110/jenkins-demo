@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'prod'],
+            description: 'Choose deployment environment'
+        )
+    }
+
     environment {
         AWS_REGION = 'ap-southeast-2'
         ECR_REGISTRY = '470914319097.dkr.ecr.ap-southeast-2.amazonaws.com'
@@ -8,6 +16,13 @@ pipeline {
     }
 
     stages {
+
+        stage('Show Parameters') {
+            steps {
+                echo "Selected environment: ${params.ENVIRONMENT}"
+                echo "Build number: ${BUILD_NUMBER}"
+            }
+        }
 
         stage('Test') {
             steps {
